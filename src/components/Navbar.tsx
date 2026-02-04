@@ -7,6 +7,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
 
   const isMarkets = location.pathname === '/markets';
+  const isVaults = location.pathname === '/vaults';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
@@ -26,7 +27,12 @@ const Navbar: React.FC = () => {
               >
                 Markets
               </Link>
-              <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Vaults</a>
+              <Link
+                to="/vaults"
+                className={`${isVaults ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
+              >
+                Vaults
+              </Link>
               <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Green Assets</a>
               <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Governance</a>
             </div>

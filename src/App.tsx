@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import MarketsPage from './pages/MarketsPage';
 import SignUpPage from './pages/SignUpPage';
+import VaultsPage from './pages/VaultsPage';
 import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/markets" element={<MarketsPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/vaults" element={<VaultsPage />} />
         </Routes>
       </Router>
     </ThemeProvider>
