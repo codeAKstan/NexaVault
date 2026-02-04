@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   const isMarkets = location.pathname === '/markets';
@@ -37,7 +38,7 @@ const Navbar: React.FC = () => {
               <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Governance</a>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={toggleTheme}
               className="p-2 text-gray-500 hover:text-primary dark:text-gray-400"
@@ -55,9 +56,68 @@ const Navbar: React.FC = () => {
                 Get Started
               </Link>
             )}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-gray-500 hover:text-primary dark:text-gray-400 md:hidden"
+            >
+              <span className="material-symbols-outlined">
+                {isMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800">
+          <div className="px-4 pt-2 pb-6 space-y-1">
+            <Link
+              to="/markets"
+              onClick={() => setIsMenuOpen(false)}
+              className={`${isMarkets ? 'text-primary bg-emerald-50 dark:bg-emerald-900/20' : 'text-gray-600 dark:text-gray-300'} block px-3 py-3 rounded-xl text-base font-medium`}
+            >
+              Markets
+            </Link>
+            <Link
+              to="/vaults"
+              onClick={() => setIsMenuOpen(false)}
+              className={`${isVaults ? 'text-primary bg-emerald-50 dark:bg-emerald-900/20' : 'text-gray-600 dark:text-gray-300'} block px-3 py-3 rounded-xl text-base font-medium`}
+            >
+              Vaults
+            </Link>
+            <a
+              href="#"
+              className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Green Assets
+            </a>
+            <a
+              href="#"
+              className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Governance
+            </a>
+            <div className="pt-4 px-3">
+              {isMarkets ? (
+                <a className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20" href="#">
+                  Connect Wallet
+                </a>
+              ) : (
+                <Link
+                  to="/signup"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20"
+                >
+                  Get Started
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
