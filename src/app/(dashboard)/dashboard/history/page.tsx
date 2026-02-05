@@ -65,7 +65,7 @@ const HistoryPage: React.FC = () => {
         </div>
 
         {/* Headers */}
-        <div className="grid grid-cols-4 gap-4 px-6 mb-4 text-sm font-bold text-gray-400 uppercase tracking-wider">
+        <div className="hidden md:grid grid-cols-4 gap-4 px-6 mb-4 text-sm font-bold text-gray-400 uppercase tracking-wider">
           <div>Amount</div>
           <div>Payment mode</div>
           <div>Status</div>
@@ -75,11 +75,18 @@ const HistoryPage: React.FC = () => {
         {/* List */}
         <div className="space-y-2">
           {transactions.filter(t => t.type === activeTab).map((tx) => (
-            <div key={tx.id} className="grid grid-cols-4 gap-4 px-6 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors items-center border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
-              <div className="font-bold text-gray-900 dark:text-white">{tx.amount}</div>
-              <div className="text-gray-600 dark:text-gray-300">{tx.mode}</div>
-              <div>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+            <div key={tx.id} className="flex flex-col md:grid md:grid-cols-4 gap-4 px-6 py-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors md:items-center border border-transparent hover:border-gray-100 dark:hover:border-gray-800 bg-gray-50/50 md:bg-transparent dark:bg-slate-800/30">
+              <div className="flex justify-between md:block">
+                <span className="md:hidden text-sm text-gray-500">Amount</span>
+                <span className="font-bold text-gray-900 dark:text-white">{tx.amount}</span>
+              </div>
+              <div className="flex justify-between md:block">
+                <span className="md:hidden text-sm text-gray-500">Payment Mode</span>
+                <span className="text-gray-600 dark:text-gray-300">{tx.mode}</span>
+              </div>
+              <div className="flex justify-between md:block">
+                <span className="md:hidden text-sm text-gray-500">Status</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold inline-block ${
                   tx.status === 'Processed' 
                     ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' 
                     : 'bg-yellow-100 text-yellow-600'
@@ -87,7 +94,10 @@ const HistoryPage: React.FC = () => {
                   {tx.status}
                 </span>
               </div>
-              <div className="text-right text-gray-500 text-sm">{tx.date}</div>
+              <div className="flex justify-between md:block md:text-right">
+                <span className="md:hidden text-sm text-gray-500">Date</span>
+                <span className="text-gray-500 text-sm">{tx.date}</span>
+              </div>
             </div>
           ))}
           

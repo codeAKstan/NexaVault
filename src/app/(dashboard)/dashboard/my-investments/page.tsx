@@ -48,13 +48,13 @@ const MyInvestmentsPage: React.FC = () => {
 
         <div className="space-y-6">
           {investments.map((investment) => (
-            <div key={investment.id} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
-              <div className="space-y-4 flex-1">
+            <div key={investment.id} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
+              <div className="space-y-4 flex-1 w-full text-center md:text-left">
                 <h3 className="font-bold text-gray-900 dark:text-white">{investment.tier}</h3>
                 <p className="text-gray-400 text-sm">Amount - {investment.amount}</p>
               </div>
 
-              <div className="flex-1 text-center space-y-4">
+              <div className="flex-1 text-center space-y-4 w-full">
                 <div className="flex items-center justify-center gap-2 text-xs font-medium text-gray-900 dark:text-white">
                   <span>{investment.startDate}</span>
                   <span className="material-symbols-outlined text-sm text-gray-400">arrow_forward</span>
@@ -66,10 +66,12 @@ const MyInvestmentsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex-1 text-right flex items-center justify-end gap-12">
+              <div className="flex-1 text-right flex items-center justify-center md:justify-end gap-12 w-full">
                 <div className="text-center">
                    <p className="text-sm text-gray-500 mb-1">Status</p>
-                   {/* Status placeholder - empty in screenshot, but good to have ready */}
+                   <span className="px-3 py-1 bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs font-bold rounded-full">
+                      {investment.status}
+                   </span>
                 </div>
                 <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-emerald-500">
                   <span className="material-symbols-outlined">chevron_right</span>
