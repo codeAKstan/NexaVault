@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../layouts/Layout';
 
 const GovernancePage: React.FC = () => {
@@ -19,9 +20,9 @@ const GovernancePage: React.FC = () => {
                   Participate in NexaVault decisions. Your tokens represent your voice in steering sustainable capital toward real-world impact projects.
                 </p>
               </div>
-              <button className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary text-secondary dark:text-white px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 transition-all shadow-sm">
+              <Link to="/signup" className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 hover:border-primary text-secondary dark:text-white px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 transition-all shadow-sm">
                 <span className="material-symbols-outlined text-lg">add</span> Create Proposal
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -93,16 +94,16 @@ const GovernancePage: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    <button className="bg-secondary text-white dark:bg-white dark:text-secondary px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+                    <Link to="/signup" className="bg-secondary text-white dark:bg-white dark:text-secondary px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
                       Vote Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
               
-              <button className="w-full py-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-2xl text-gray-500 font-medium hover:border-primary hover:text-primary transition-colors">
+              <Link to="/signup" className="block w-full py-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-2xl text-gray-500 font-medium hover:border-primary hover:text-primary transition-colors text-center">
                 Load More Proposals
-              </button>
+              </Link>
             </div>
 
             {/* Right Column: Sidebar */}
@@ -152,9 +153,9 @@ const GovernancePage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <button className="w-full mt-6 text-sm text-emerald-500 font-bold hover:text-emerald-600">
+                <Link to="/signup" className="block w-full mt-6 text-sm text-emerald-500 font-bold hover:text-emerald-600 text-center">
                   View all history
-                </button>
+                </Link>
               </div>
 
               {/* Delegate Card */}
@@ -163,9 +164,9 @@ const GovernancePage: React.FC = () => {
                 <p className="text-emerald-50 text-sm mb-6 leading-relaxed">
                   Delegate your voting power to a trusted community member or professional steward to ensure your voice is heard.
                 </p>
-                <button className="w-full bg-white text-primary font-bold py-3 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm">
+                <Link to="/signup" className="block w-full bg-white text-primary font-bold py-3 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm text-center">
                   Choose a Delegate
-                </button>
+                </Link>
               </div>
             </div>
           </div>
