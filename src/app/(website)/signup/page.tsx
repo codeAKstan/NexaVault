@@ -29,6 +29,26 @@ const SignUpPage: React.FC = () => {
   };
 
   const handleNext = async () => {
+    // Validate current step
+    if (step === 1 && !formData.name) {
+      setError('Please enter your full name');
+      return;
+    }
+    if (step === 2 && (!formData.phone || !formData.address || !formData.city || !formData.zip)) {
+      setError('Please fill in all contact details');
+      return;
+    }
+    if (step === 3 && (!formData.email || !formData.username)) {
+      setError('Please fill in all account details');
+      return;
+    }
+    if (step === 4 && (!formData.password || !formData.confirmPassword)) {
+      setError('Please fill in all security details');
+      return;
+    }
+
+    setError(''); // Clear error if validation passes
+
     if (step < 4) {
       setStep(step + 1);
     } else {
