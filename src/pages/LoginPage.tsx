@@ -40,17 +40,7 @@ const LoginPage: React.FC = () => {
             ))}
           </div>
         </div>
-        <div className="absolute bottom-12 left-12 right-12">
-          <div className="glass-card p-6 rounded-3xl border-white/10 bg-white/10 backdrop-blur-md">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-500"></div>
-              <div>
-                <p className="text-white text-sm font-medium">"The most intuitive DeFi platform I've ever used."</p>
-                <p className="text-gray-400 text-xs">Alex R., Verified ESG Investor</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 md:p-24 bg-white dark:bg-background-dark">
         <div className="w-full max-w-md">
@@ -111,23 +101,6 @@ const LoginPage: React.FC = () => {
               Log In <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
           </form>
-          <div className="mt-8">
-            <div className="relative flex items-center py-4">
-              <div className="flex-grow border-t border-gray-100 dark:border-gray-800"></div>
-              <span className="flex-shrink mx-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Or continue with</span>
-              <div className="flex-grow border-t border-gray-100 dark:border-gray-800"></div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                <span className="material-symbols-outlined text-blue-500">account_balance_wallet</span>
-                <span className="text-sm font-semibold">Web3 Wallet</span>
-              </button>
-              <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                <span className="material-symbols-outlined text-primary">fingerprint</span>
-                <span className="text-sm font-semibold">Passkey</span>
-              </button>
-            </div>
-          </div>
           <p className="mt-12 text-center text-gray-600 dark:text-gray-400">
             Don't have an account?
             <Link className="text-primary font-bold hover:underline" to="/signup">Sign up now</Link>

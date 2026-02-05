@@ -226,12 +226,10 @@ const LandingPage: React.FC = () => {
             </div>
             <div className="relative">
               <div className="bg-gradient-to-tr from-primary to-blue-500 rounded-[3rem] p-1 shadow-2xl overflow-hidden aspect-square flex items-center justify-center">
-                <div className="bg-white dark:bg-slate-900 w-full h-full rounded-[2.8rem] p-8 flex flex-col justify-center items-center text-center">
-                  <div className="mb-8 p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl">
-                    <span className="material-symbols-outlined text-8xl text-primary animate-pulse">payments</span>
-                  </div>
-                  <p className="text-2xl font-bold mb-2">Yields Paid Daily</p>
-                  <p className="text-gray-500">Join 250k+ users already earning with NexaVault.</p>
+                <div className="bg-white dark:bg-slate-900 w-full h-full rounded-[2.8rem] p-8 flex flex-col justify-center items-center text-center bg-[url('/chart.jpg')] bg-cover bg-center">
+                  
+                  <p className="text-2xl font-bold mb-2 relative z-10 text-white">Yields Paid Daily</p>
+                  <p className="text-gray-500 relative z-10 text-white">Join 250k+ users already earning with NexaVault.</p>
                 </div>
               </div>
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent/20 rounded-full blur-2xl"></div>
