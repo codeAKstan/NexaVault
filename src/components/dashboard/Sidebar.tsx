@@ -5,7 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const pathname = usePathname();
   const { logout } = useAuth();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>('Investments');
@@ -27,17 +32,32 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-secondary text-white hidden lg:flex flex-col fixed h-full z-20">
-      <div className="h-20 flex items-center px-8 border-b border-gray-800">
-        <Link href="/" className="flex items-center gap-2">
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      <aside className={`w-64 bg-secondary text-white flex flex-col fixed h-full z-50 transition-transform duration-300 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-20 flex items-center justify-between px-8 border-b border-gray-800">
+          <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="material-symbols-outlined text-white text-sm">shield_with_heart</span>
           </div>
-          <span className="text-xl font-display font-bold">NexaVault</span>
-        </Link>
-      </div>
+            <span className="text-xl font-display font-bold">NexaVault</span>
+          </Link>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="lg:hidden text-gray-400 hover:text-white"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
 
-      <div className="p-4 space-y-2 mt-4 flex-grow">
+        <div className="p-4 space-y-2 mt-4 flex-grow overflow-y-auto">
         {menuItems.map((item) => {
           if (item.submenu) {
             const isSubmenuOpen = openSubmenu === item.name;
@@ -68,6 +88,7 @@ const Sidebar: React.FC = () => {
                       <Link
                         key={sub.name}
                         href={sub.path}
+                        onClick={() => setIsOpen(false)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
                           pathname === sub.path
                             ? 'text-white font-medium'
@@ -89,6 +110,7 @@ const Sidebar: React.FC = () => {
             <Link
               key={item.name}
               href={item.path}
+              onClick={() => setIsOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 isActive
                   ? 'bg-primary/10 text-primary border-l-4 border-primary'
@@ -117,7 +139,7 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
       
-      <div className="p-4 mt-auto border-t border-gray-800">
+        <div className="p-4 mt-auto border-t border-gray-800">
          <div className="bg-gray-800 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
                <span className="text-xs text-gray-400">Sustainable Tier</span>
@@ -126,7 +148,8 @@ const Sidebar: React.FC = () => {
             <p className="font-bold text-white text-sm">Green Pro</p>
          </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 
