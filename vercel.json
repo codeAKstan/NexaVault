@@ -1,0 +1,4 @@
+{
+  "$schema": "https://vercel.com/schemas/v2/vercel.json",
+  "outputDirectory": "dist"
+}
