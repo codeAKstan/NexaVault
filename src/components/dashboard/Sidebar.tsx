@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
@@ -8,12 +8,21 @@ import { useAuth } from '../../context/AuthContext';
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>('Investments');
 
   const menuItems = [
     { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
     { name: 'Deposit', icon: 'account_balance', path: '/dashboard/deposit' },
     { name: 'Withdraw', icon: 'payments', path: '/dashboard/withdraw' },
-    { name: 'Investments', icon: 'trending_up', path: '/dashboard/investments' },
+    { 
+      name: 'Investments', 
+      icon: 'trending_up', 
+      path: '#',
+      submenu: [
+        { name: 'Invest', path: '/dashboard/invest' },
+        { name: 'My investments', path: '/dashboard/my-investments' }
+      ]
+    },
     { name: 'Transaction History', icon: 'history', path: '/dashboard/history' },
   ];
 
@@ -30,6 +39,51 @@ const Sidebar: React.FC = () => {
 
       <div className="p-4 space-y-2 mt-4 flex-grow">
         {menuItems.map((item) => {
+          if (item.submenu) {
+            const isSubmenuOpen = openSubmenu === item.name;
+            const isChildActive = item.submenu.some(sub => pathname === sub.path);
+            
+            return (
+              <div key={item.name}>
+                <button
+                  onClick={() => setOpenSubmenu(isSubmenuOpen ? null : item.name)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                    isChildActive || isSubmenuOpen
+                      ? 'text-emerald-400'
+                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined">{item.icon}</span>
+                    <span className="font-medium text-sm">{item.name}</span>
+                  </div>
+                  <span className={`material-symbols-outlined text-sm transition-transform ${isSubmenuOpen ? 'rotate-180' : ''}`}>
+                    expand_more
+                  </span>
+                </button>
+                
+                {isSubmenuOpen && (
+                  <div className="ml-4 pl-4 border-l border-gray-700 space-y-1 mt-1">
+                    {item.submenu.map((sub) => (
+                      <Link
+                        key={sub.name}
+                        href={sub.path}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
+                          pathname === sub.path
+                            ? 'text-white font-medium'
+                            : 'text-gray-500 hover:text-gray-300'
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           const isActive = pathname === item.path;
           return (
             <Link
