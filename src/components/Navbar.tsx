@@ -47,15 +47,9 @@ const Navbar: React.FC = () => {
                 {theme === 'dark' ? 'light_mode' : 'dark_mode'}
               </span>
             </button>
-            {isMarkets ? (
-              <a className="hidden sm:inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20" href="#">
-                Connect Wallet
-              </a>
-            ) : (
-              <Link to="/signup" className="hidden sm:inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20">
-                Get Started
-              </Link>
-            )}
+            <Link to="/signup" className="hidden sm:inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20">
+              Get Started
+            </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 text-gray-500 hover:text-primary dark:text-gray-400 md:hidden"

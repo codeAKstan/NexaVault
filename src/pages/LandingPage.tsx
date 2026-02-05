@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 const LandingPage: React.FC = () => {
   return (
     <Layout>
-      <header className="relative overflow-hidden pt-16 pb-24 sm:pt-24 lg:pt-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="relative overflow-hidden pt-16 pb-24 sm:pt-24 lg:pt-32 bg-[url('/bg-hero.png')] bg-cover bg-center">
+        <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/90"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 mb-6">
@@ -107,19 +108,25 @@ const LandingPage: React.FC = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "DeFi Yield Vaults", desc: "Automated yield farming across multiple chains. We find the best risk-adjusted returns for your stablecoins.", icon: "account_tree",
-                bgColor: "bg-emerald-50 dark:bg-emerald-900/20", textColor: "text-emerald-500" },
+                bgColor: "bg-emerald-50 dark:bg-emerald-900/20", textColor: "text-emerald-500", image: "/defidash.png" },
               { title: "Green Tokenization", desc: "Fractionalized ownership of solar farms and wind energy projects. Earn dividends while saving the planet.", icon: "solar_power",
-                bgColor: "bg-blue-50 dark:bg-blue-900/20", textColor: "text-blue-500" },
+                bgColor: "bg-blue-50 dark:bg-blue-900/20", textColor: "text-blue-500", image: "/green.png" },
               { title: "RWA Assurance", desc: "Every real-world asset is backed by legal documentation and physical audits verified on-chain via zk-proofs.", icon: "verified_user",
-                bgColor: "bg-amber-50 dark:bg-amber-900/20", textColor: "text-amber-500" }
+                bgColor: "bg-amber-50 dark:bg-amber-900/20", textColor: "text-amber-500", image: "/rwa.png" }
             ].map((service, i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:shadow-primary/10 transition-all group">
-                <div className={`w-16 h-16 ${service.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                  <span className={`material-symbols-outlined ${service.textColor} text-3xl`}>{service.icon}</span>
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:shadow-primary/10 transition-all group overflow-hidden">
+                <div className="h-48 overflow-hidden relative">
+                   <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent z-10"></div>
+                   <img src={service.image} alt={service.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
                 </div>
-                <h4 className="text-xl font-bold mb-4">{service.title}</h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">{service.desc}</p>
-                <a className="text-primary font-semibold flex items-center gap-2 hover:gap-4 transition-all" href="#">Learn More <span className="material-symbols-outlined text-sm">arrow_forward</span></a>
+                <div className="p-8 relative z-20 -mt-12">
+                   <div className={`w-16 h-16 ${service.bgColor} rounded-2xl flex items-center justify-center mb-6 shadow-sm`}>
+                      <span className={`material-symbols-outlined ${service.textColor} text-3xl`}>{service.icon}</span>
+                   </div>
+                   <h4 className="text-xl font-bold mb-4">{service.title}</h4>
+                   <p className="text-gray-600 dark:text-gray-400 mb-6">{service.desc}</p>
+                   <a className="text-primary font-semibold flex items-center gap-2 hover:gap-4 transition-all" href="#">Learn More <span className="material-symbols-outlined text-sm">arrow_forward</span></a>
+                </div>
               </div>
             ))}
           </div>
@@ -244,15 +251,15 @@ const LandingPage: React.FC = () => {
           <h2 className="text-center text-primary font-bold text-sm uppercase tracking-widest mb-16">Trusted by the community</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { name: "Marcus Chen", role: "Early Adopter & ESG Investor", quote: "NexaVault changed how I think about crypto. It's not just about speculation anymore; I can actually see the real-world impact of my investments in green energy.", color: "from-primary to-blue-500" },
-              { name: "Sarah Williams", role: "Institutional Portfolio Manager", quote: "The interface is miles ahead of any other DeFi protocol I've used. Professional, secure, and transparent. The RWA verification process is industry-leading.", color: "from-purple-500 to-pink-500" }
+              { name: "Marcus Chen", role: "Early Adopter & ESG Investor", quote: "NexaVault changed how I think about crypto. It's not just about speculation anymore; I can actually see the real-world impact of my investments in green energy.", image: "/chen.png" },
+              { name: "Sarah Williams", role: "Institutional Portfolio Manager", quote: "The interface is miles ahead of any other DeFi protocol I've used. Professional, secure, and transparent. The RWA verification process is industry-leading.", image: "/sarah.png" }
             ].map((t, i) => (
               <div key={i} className="bg-white dark:bg-slate-900 p-10 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative">
                 <span className="material-symbols-outlined text-primary/20 text-7xl absolute top-6 right-8">format_quote</span>
                 <div className="relative">
                   <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed italic">"{t.quote}"</p>
                   <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${t.color}`}></div>
+                    <img src={t.image} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-800 shadow-sm" />
                     <div>
                       <h5 className="font-bold">{t.name}</h5>
                       <p className="text-sm text-gray-500">{t.role}</p>
