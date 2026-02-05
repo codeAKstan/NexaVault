@@ -23,6 +23,12 @@ const Navbar: React.FC = () => {
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-8">
               <Link
+                to="/"
+                className={`${location.pathname === '/' ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
+              >
+                Home
+              </Link>
+              <Link
                 to="/markets"
                 className={`${isMarkets ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
               >
@@ -34,7 +40,8 @@ const Navbar: React.FC = () => {
               >
                 Vaults
               </Link>
-              <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Green Assets</a>
+              <Link to="/about" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">About Us</Link>
+              <Link to="/support" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Support</Link>
               <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Governance</a>
             </div>
           </div>
@@ -87,6 +94,20 @@ const Navbar: React.FC = () => {
             >
               Green Assets
             </a>
+            <Link
+              to="/about"
+              className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/support"
+              className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Support
+            </Link>
             <a
               href="#"
               className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
@@ -95,19 +116,13 @@ const Navbar: React.FC = () => {
               Governance
             </a>
             <div className="pt-4 px-3">
-              {isMarkets ? (
-                <a className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20" href="#">
-                  Connect Wallet
-                </a>
-              ) : (
-                <Link
-                  to="/signup"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20"
-                >
-                  Get Started
-                </Link>
-              )}
+              <Link
+                to="/signup"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20"
+              >
+                Get Started
+              </Link>
             </div>
           </div>
         </div>
