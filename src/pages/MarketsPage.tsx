@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../layouts/Layout';
 
 const MarketsPage: React.FC = () => {
@@ -155,7 +156,7 @@ const MarketsPage: React.FC = () => {
                       <td className="px-8 py-5"><p className="text-sm font-medium">{asset.vol}</p></td>
                       <td className="px-8 py-5"><p className="text-sm font-medium">{asset.tvl}</p></td>
                       <td className="px-8 py-5 text-right">
-                        <button className="bg-secondary text-white dark:bg-white dark:text-secondary px-6 py-2 rounded-xl text-sm font-bold hover:scale-105 transition-transform">{asset.action}</button>
+                        <Link to="/login" className="inline-block bg-secondary text-white dark:bg-white dark:text-secondary px-6 py-2 rounded-xl text-sm font-bold hover:scale-105 transition-transform">{asset.action}</Link>
                       </td>
                     </tr>
                   ))}
