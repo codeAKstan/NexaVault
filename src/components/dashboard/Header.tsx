@@ -2,9 +2,11 @@
 
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
 
   return (
     <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-8 sticky top-0 z-10 ml-0 lg:ml-64">
@@ -37,11 +39,11 @@ const Header: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-gray-900 dark:text-white">Anuda J.</p>
-            <p className="text-xs text-gray-500">@anuda_v</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white">{user?.name || 'User'}</p>
+            <p className="text-xs text-gray-500">@{user?.username || 'Username'}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden">
-             <img src="https://ui-avatars.com/api/?name=Anuda+J&background=10b981&color=fff" alt="Profile" />
+             <img src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=10b981&color=fff`} alt="Profile" />
           </div>
         </div>
       </div>

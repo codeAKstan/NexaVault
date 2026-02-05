@@ -15,6 +15,28 @@ const UserSchema = new mongoose.Schema({
       'Please provide a valid email',
     ],
   },
+  username: {
+    type: String,
+    required: [true, 'Please provide a username'],
+    unique: true,
+    maxlength: [30, 'Username cannot be more than 30 characters'],
+  },
+  phone: {
+    type: String,
+    required: [true, 'Please provide a phone number'],
+  },
+  address: {
+    type: String,
+    required: [true, 'Please provide an address'],
+  },
+  city: {
+    type: String,
+    required: [true, 'Please provide a city'],
+  },
+  zip: {
+    type: String,
+    required: [true, 'Please provide a postal code'],
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],

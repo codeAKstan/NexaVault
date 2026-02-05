@@ -37,13 +37,13 @@ export async function POST(req: Request) {
     }
 
     const token = jwt.sign(
-      { userId: user._id, name: user.name, email: user.email },
+      { userId: user._id, name: user.name, email: user.email, username: user.username },
       process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '1d' }
     );
 
     // Set cookie
-    cookies().set('token', token, {
+    (await cookies()).set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 1 day
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(
-      { message: 'Login successful', user: { name: user.name, email: user.email } },
+      { message: 'Login successful', user: { name: user.name, email: user.email, username: user.username } },
       { status: 200 }
     );
   } catch (error: any) {

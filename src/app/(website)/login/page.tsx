@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../../../context/ThemeContext';
+import { useAuth } from '../../../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { checkAuth } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -14,6 +16,7 @@ const LoginPage: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -40,6 +43,7 @@ const LoginPage: React.FC = () => {
         throw new Error(data.error || 'Invalid credentials');
       }
 
+      await checkAuth(); // Update auth state
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
@@ -135,11 +139,17 @@ const LoginPage: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                 />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" type="button">
-                  <span className="material-symbols-outlined">visibility</span>
+                <button
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <span className="material-symbols-outlined">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
                 </button>
               </div>
             </div>

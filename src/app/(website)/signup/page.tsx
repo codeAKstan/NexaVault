@@ -22,6 +22,8 @@ const SignUpPage: React.FC = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -75,6 +77,11 @@ const SignUpPage: React.FC = () => {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          zip: formData.zip,
+          username: formData.username,
         }),
       });
 
@@ -319,11 +326,17 @@ const SignUpPage: React.FC = () => {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       required
                     />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" type="button">
-                      <span className="material-symbols-outlined text-xl">visibility</span>
+                    <button
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <span className="material-symbols-outlined text-xl">
+                        {showPassword ? 'visibility_off' : 'visibility'}
+                      </span>
                     </button>
                   </div>
                   <div className="mt-3 flex gap-1">
@@ -343,11 +356,17 @@ const SignUpPage: React.FC = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       required
                     />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" type="button">
-                      <span className="material-symbols-outlined text-xl">visibility</span>
+                    <button
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <span className="material-symbols-outlined text-xl">
+                        {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                      </span>
                     </button>
                   </div>
                 </div>

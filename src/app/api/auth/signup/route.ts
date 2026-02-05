@@ -7,9 +7,9 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
 
-    const { name, email, password } = await req.json();
+    const { name, email, password, phone, address, city, zip, username } = await req.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone || !address || !city || !zip || !username) {
       return NextResponse.json(
         { error: 'Please provide all required fields' },
         { status: 400 }
@@ -25,6 +25,15 @@ export async function POST(req: Request) {
       );
     }
 
+    const usernameExists = await User.findOne({ username });
+
+    if (usernameExists) {
+      return NextResponse.json(
+        { error: 'Username already taken' },
+        { status: 400 }
+      );
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -32,6 +41,11 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      phone,
+      address,
+      city,
+      zip,
+      username,
     });
 
     return NextResponse.json(

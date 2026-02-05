@@ -3,9 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
@@ -47,7 +49,14 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="p-4">
-        <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Wallet</p>
+        <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Account</p>
+        <button 
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 text-gray-400 transition-all mb-4"
+        >
+          <span className="material-symbols-outlined">logout</span>
+          <span className="font-medium text-sm">Log Out</span>
+        </button>
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all text-emerald-400 border border-gray-700">
           <span className="material-symbols-outlined">account_balance_wallet</span>
           <span className="font-medium text-sm">Connect Wallet</span>

@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
+import { useAuth } from '../../../context/AuthContext';
 
 const DashboardPage: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, Anuda!</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Your sustainable DeFi portfolio is performing 12% above market average.</p>
       </div>
 
