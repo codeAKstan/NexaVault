@@ -1,21 +1,24 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
-  const isMarkets = location.pathname === '/markets';
-  const isVaults = location.pathname === '/vaults';
+  const isMarkets = pathname === '/markets';
+  const isVaults = pathname === '/vaults';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <span className="material-symbols-outlined text-white">shield_with_heart</span>
               </div>
@@ -23,26 +26,26 @@ const Navbar: React.FC = () => {
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-8">
               <Link
-                to="/"
-                className={`${location.pathname === '/' ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
+                href="/"
+                className={`${pathname === '/' ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
               >
                 Home
               </Link>
               <Link
-                to="/markets"
+                href="/markets"
                 className={`${isMarkets ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
               >
                 Markets
               </Link>
               <Link
-                to="/vaults"
+                href="/vaults"
                 className={`${isVaults ? 'text-primary border-b-2 border-primary' : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'} px-3 py-2 text-sm font-medium`}
               >
                 Vaults
               </Link>
-              <Link to="/about" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">About Us</Link>
-              <Link to="/support" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Support</Link>
-              <Link to="/governance" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Governance</Link>
+              <Link href="/about" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">About Us</Link>
+              <Link href="/support" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Support</Link>
+              <Link href="/governance" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Governance</Link>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
@@ -54,7 +57,7 @@ const Navbar: React.FC = () => {
                 {theme === 'dark' ? 'light_mode' : 'dark_mode'}
               </span>
             </button>
-            <Link to="/signup" className="hidden sm:inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20">
+            <Link href="/signup" className="hidden sm:inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20">
               Get Started
             </Link>
             <button
@@ -74,14 +77,14 @@ const Navbar: React.FC = () => {
         <div className="md:hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800">
           <div className="px-4 pt-2 pb-6 space-y-1">
             <Link
-              to="/markets"
+              href="/markets"
               onClick={() => setIsMenuOpen(false)}
               className={`${isMarkets ? 'text-primary bg-emerald-50 dark:bg-emerald-900/20' : 'text-gray-600 dark:text-gray-300'} block px-3 py-3 rounded-xl text-base font-medium`}
             >
               Markets
             </Link>
             <Link
-              to="/vaults"
+              href="/vaults"
               onClick={() => setIsMenuOpen(false)}
               className={`${isVaults ? 'text-primary bg-emerald-50 dark:bg-emerald-900/20' : 'text-gray-600 dark:text-gray-300'} block px-3 py-3 rounded-xl text-base font-medium`}
             >
@@ -95,21 +98,21 @@ const Navbar: React.FC = () => {
               Green Assets
             </a>
             <Link
-              to="/about"
+              href="/about"
               className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
             </Link>
             <Link
-              to="/support"
+              href="/support"
               className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Support
             </Link>
             <Link
-              to="/governance"
+              href="/governance"
               className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
@@ -117,7 +120,7 @@ const Navbar: React.FC = () => {
             </Link>
             <div className="pt-4 px-3">
               <Link
-                to="/signup"
+                href="/signup"
                 onClick={() => setIsMenuOpen(false)}
                 className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-full text-white bg-primary hover:bg-emerald-600 transition-all shadow-lg shadow-primary/20"
               >
