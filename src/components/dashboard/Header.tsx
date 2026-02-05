@@ -4,20 +4,33 @@ import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
 
   return (
-    <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-8 sticky top-0 z-10 ml-0 lg:ml-64">
-      <div className="flex-1 max-w-xl">
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-          <input
-            type="text"
-            placeholder="Search markets, vaults or transactions..."
-            className="w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-          />
+    <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-10 ml-0 lg:ml-64">
+      <div className="flex items-center gap-4 flex-1">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-gray-500 hover:text-primary dark:text-gray-400 transition-colors"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+
+        <div className="hidden lg:flex flex-1 max-w-xl">
+          <div className="relative w-full">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+            <input
+              type="text"
+              placeholder="Search markets, vaults or transactions..."
+              className="w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+            />
+          </div>
         </div>
       </div>
 
