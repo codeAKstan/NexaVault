@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
               </Link>
               <Link to="/about" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">About Us</Link>
               <Link to="/support" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Support</Link>
-              <a className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium" href="#">Governance</a>
+              <Link to="/governance" className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary px-3 py-2 text-sm font-medium">Governance</Link>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
@@ -108,13 +108,13 @@ const Navbar: React.FC = () => {
             >
               Support
             </Link>
-            <a
-              href="#"
+            <Link
+              to="/governance"
               className="text-gray-600 dark:text-gray-300 block px-3 py-3 rounded-xl text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Governance
-            </a>
+            </Link>
             <div className="pt-4 px-3">
               <Link
                 to="/signup"
