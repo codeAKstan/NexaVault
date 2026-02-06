@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +11,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const pathname = usePathname();
+  const [investmentsOpen, setInvestmentsOpen] = useState(false);
 
   const menuItems = [
     { name: 'Overview', icon: 'dashboard', path: '/admin/dashboard' },
@@ -18,6 +19,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
     { name: 'Deposits', icon: 'account_balance_wallet', path: '/admin/deposits' },
     { name: 'Withdraws', icon: 'payments', path: '/admin/withdraws' },
     { name: 'Wallet Connects', icon: 'account_balance', path: '/admin/wallets' },
+  ];
+
+  const investmentItems = [
+    { name: 'Investment Plans', path: '/admin/investments/plans' },
+    { name: 'Active Investments', path: '/admin/investments/active' },
   ];
 
   return (
@@ -33,7 +39,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
       <div className={`w-64 bg-secondary dark:bg-slate-900 h-screen fixed left-0 top-0 flex flex-col justify-between border-r border-gray-800 z-50 transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
-        <div>
+        <div className="overflow-y-auto">
           <div className="p-6 mb-6 flex items-center justify-between">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
@@ -62,6 +68,44 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
                 <span className="text-sm">{item.name}</span>
               </Link>
             ))}
+
+            {/* Investments Dropdown */}
+            <div>
+              <button
+                onClick={() => setInvestmentsOpen(!investmentsOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                  pathname.startsWith('/admin/investments')
+                    ? 'bg-primary/10 text-primary font-bold'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined">inventory_2</span>
+                  <span className="text-sm">Investments</span>
+                </div>
+                <span className={`material-symbols-outlined text-sm transition-transform ${investmentsOpen ? 'rotate-180' : ''}`}>expand_more</span>
+              </button>
+              
+              {investmentsOpen && (
+                <div className="mt-1 ml-4 pl-4 border-l border-gray-800 space-y-1">
+                  {investmentItems.map((subItem) => (
+                    <Link
+                      key={subItem.path}
+                      href={subItem.path}
+                      onClick={() => onClose()}
+                      className={`flex items-center gap-3 px-4 py-2 rounded-xl transition-all text-sm ${
+                        pathname === subItem.path
+                          ? 'text-primary font-bold'
+                          : 'text-gray-500 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                      {subItem.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
             
             <div className="pt-8 pb-4 px-4">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Administration</p>
