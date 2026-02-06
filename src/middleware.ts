@@ -3,8 +3,27 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
+  const adminToken = request.cookies.get('admin_token')?.value;
   const { pathname } = request.nextUrl;
 
+  // --- Admin Authentication ---
+  if (pathname.startsWith('/admin')) {
+    // If trying to access admin login page
+    if (pathname === '/admin/login') {
+      if (adminToken) {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
+      return NextResponse.next();
+    }
+
+    // If trying to access protected admin routes
+    if (!adminToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // --- User Authentication ---
   // Paths that require authentication
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
