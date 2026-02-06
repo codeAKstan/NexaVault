@@ -41,6 +41,19 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
   },
+  kycStatus: {
+    type: String,
+    enum: ['verified', 'pending', 'rejected', 'unverified'],
+    default: 'unverified',
+  },
+  walletAddress: {
+    type: String,
+    default: '',
+  },
+  totalInvested: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
