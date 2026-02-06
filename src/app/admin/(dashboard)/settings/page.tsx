@@ -48,6 +48,13 @@ const AdminSettingsPage: React.FC = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Security Settings
+  const [security, setSecurity] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -151,6 +158,43 @@ const AdminSettingsPage: React.FC = () => {
     }
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+
+    if (security.newPassword !== security.confirmPassword) {
+        setMessage({ type: 'error', text: 'New passwords do not match' });
+        setSaving(false);
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/admin/security/password', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                currentPassword: security.currentPassword,
+                newPassword: security.newPassword
+            }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setMessage({ type: 'success', text: 'Password updated successfully' });
+            setSecurity({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } else {
+            setMessage({ type: 'error', text: data.error || 'Failed to update password' });
+        }
+    } catch (error) {
+        console.error('Password update error:', error);
+        setMessage({ type: 'error', text: 'An error occurred' });
+    } finally {
+        setSaving(false);
+    }
+  };
+
   const handleDeleteMethod = async (id: string) => {
     if (!confirm('Are you sure you want to delete this payment method?')) return;
     
@@ -204,10 +248,10 @@ const AdminSettingsPage: React.FC = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-800 mb-8">
         <div className="flex gap-8">
-          {['General', 'Payment Settings'].map((tab) => (
+          {['General', 'Payment Settings', 'Security'].map((tab) => (
             <button 
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => { setActiveTab(tab); setMessage(null); }}
               className={`pb-4 text-sm font-bold transition-all relative whitespace-nowrap ${
                 activeTab === tab 
                   ? 'text-primary' 
@@ -346,6 +390,61 @@ const AdminSettingsPage: React.FC = () => {
             )}
           </div>
         </div>
+      )}
+
+      {activeTab === 'Security' && (
+        <form onSubmit={handleUpdatePassword} className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6 max-w-2xl">
+          <h3 className="font-bold text-lg text-slate-900 dark:text-white">Change Password</h3>
+          <p className="text-sm text-gray-500">Ensure your account is using a long, random password to stay secure.</p>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
+              <input 
+                type="password" 
+                required
+                value={security.currentPassword}
+                onChange={(e) => setSecurity({...security, currentPassword: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                placeholder="••••••••"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password</label>
+              <input 
+                type="password" 
+                required
+                value={security.newPassword}
+                onChange={(e) => setSecurity({...security, newPassword: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                placeholder="••••••••"
+                minLength={6}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
+              <input 
+                type="password" 
+                required
+                value={security.confirmPassword}
+                onChange={(e) => setSecurity({...security, confirmPassword: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                placeholder="••••••••"
+                minLength={6}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <button 
+              type="submit" 
+              disabled={saving}
+              className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {saving ? 'Updating...' : 'Update Password'}
+            </button>
+          </div>
+        </form>
       )}
 
       {/* Modal */}
