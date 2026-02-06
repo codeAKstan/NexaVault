@@ -31,6 +31,10 @@ const PaymentMethodSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  qrCodeUrl: {
+    type: String,
+    default: '',
+  },
   walletAddress: {
     type: String,
     default: '', // Important for deposits

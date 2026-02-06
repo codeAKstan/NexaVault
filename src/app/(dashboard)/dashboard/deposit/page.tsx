@@ -12,6 +12,7 @@ interface PaymentMethod {
   chargesType: 'percentage' | 'fixed';
   type: 'currency' | 'crypto';
   imageUrl: string;
+  qrCodeUrl: string;
   walletAddress: string;
   isActive: boolean;
 }
@@ -23,10 +24,31 @@ const DepositPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchPaymentMethods();
   }, []);
+
+  useEffect(() => {
+    validateAmount();
+  }, [amount, selectedMethod]);
+
+  const validateAmount = () => {
+    if (!amount || !selectedMethod) {
+      setError('');
+      return;
+    }
+
+    const val = Number(amount);
+    if (val < selectedMethod.minAmount) {
+      setError(`Minimum deposit amount is $${selectedMethod.minAmount}`);
+    } else if (val > selectedMethod.maxAmount) {
+      setError(`Maximum deposit amount is $${selectedMethod.maxAmount}`);
+    } else {
+      setError('');
+    }
+  };
 
   const fetchPaymentMethods = async () => {
     try {
@@ -76,7 +98,7 @@ const DepositPage: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-bold text-gray-900 dark:text-white mb-3">
-                  {selectedMethod.name} Wallet Address
+                  {selectedMethod.type === 'crypto' ? `${selectedMethod.name} Wallet Address` : 'Payment Details / Account Number'}
                 </label>
                 <div className="relative group">
                   <div className="w-full px-4 py-3.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl break-all font-mono text-sm text-gray-600 dark:text-gray-300 pr-12">
@@ -94,26 +116,39 @@ const DepositPage: React.FC = () => {
                 </div>
                 <p className="text-xs text-blue-500 mt-2 flex items-center">
                   <span className="material-symbols-outlined text-sm mr-1">info</span>
-                  Only send {selectedMethod.name} to this address. Sending any other currency may result in permanent loss.
+                  {selectedMethod.type === 'crypto' 
+                    ? `Only send ${selectedMethod.name} to this address. Sending any other currency may result in permanent loss.`
+                    : 'Please ensure you transfer the exact amount to the account details above.'}
                 </p>
               </div>
 
               <div className="p-4 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-xl">
                 <h4 className="font-bold text-yellow-700 dark:text-yellow-500 mb-1 text-sm">Important</h4>
                 <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                  After making the payment, please allow some time for the transaction to be confirmed on the blockchain. Your balance will be updated automatically once confirmed.
+                  After making the payment, please allow some time for the transaction to be confirmed. Your balance will be updated automatically once confirmed.
                 </p>
               </div>
             </div>
 
             <div className="w-full md:w-80 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-              {selectedMethod.imageUrl ? (
+              {selectedMethod.qrCodeUrl ? (
+                <div className="relative w-48 h-48 mb-4">
+                  <Image
+                    src={selectedMethod.qrCodeUrl}
+                    alt={`${selectedMethod.name} QR Code`}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+              ) : selectedMethod.imageUrl ? (
                 <div className="relative w-48 h-48 mb-4">
                   <Image
                     src={selectedMethod.imageUrl}
                     alt={selectedMethod.name}
                     fill
                     className="object-contain"
+                    unoptimized
                   />
                 </div>
               ) : (
@@ -160,6 +195,12 @@ const DepositPage: React.FC = () => {
               <span className="material-symbols-outlined text-sm">unfold_more</span>
             </div>
           </div>
+          {error && (
+            <p className="text-red-500 text-sm mt-2 flex items-center">
+              <span className="material-symbols-outlined text-sm mr-1">error</span>
+              {error}
+            </p>
+          )}
         </div>
 
         <div className="mb-8">
@@ -188,6 +229,7 @@ const DepositPage: React.FC = () => {
                           alt={method.name}
                           fill
                           className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <span className="material-symbols-outlined text-gray-400">payments</span>
@@ -210,7 +252,7 @@ const DepositPage: React.FC = () => {
 
         <button
           className="bg-primary text-white font-bold px-8 py-3.5 rounded-full hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!amount || !selectedMethod}
+          disabled={!amount || !selectedMethod || !!error}
           onClick={() => setShowDetails(true)}
         >
           Proceed to Payment

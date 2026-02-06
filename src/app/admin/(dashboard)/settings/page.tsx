@@ -11,8 +11,10 @@ interface PaymentMethod {
   chargesType: 'percentage' | 'fixed';
   type: 'currency' | 'crypto';
   imageUrl: string;
+  qrCodeUrl: string;
   walletAddress: string;
   imageFile?: File | null;
+  qrCodeFile?: File | null;
 }
 
 const AdminSettingsPage: React.FC = () => {
@@ -39,8 +41,10 @@ const AdminSettingsPage: React.FC = () => {
     chargesType: 'percentage',
     type: 'currency',
     imageUrl: '',
+    qrCodeUrl: '',
     walletAddress: '',
     imageFile: null,
+    qrCodeFile: null,
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -118,9 +122,14 @@ const AdminSettingsPage: React.FC = () => {
       formData.append('type', currentMethod.type);
       formData.append('walletAddress', currentMethod.walletAddress);
       formData.append('imageUrl', currentMethod.imageUrl); // Keep existing URL
+      formData.append('qrCodeUrl', currentMethod.qrCodeUrl); // Keep existing URL
       
       if (currentMethod.imageFile) {
         formData.append('imageFile', currentMethod.imageFile);
+      }
+
+      if (currentMethod.qrCodeFile) {
+        formData.append('qrCodeFile', currentMethod.qrCodeFile);
       }
 
       const res = await fetch(url, {
@@ -172,8 +181,10 @@ const AdminSettingsPage: React.FC = () => {
       chargesType: 'percentage',
       type: 'currency',
       imageUrl: '',
+      qrCodeUrl: '',
       walletAddress: '',
       imageFile: null,
+      qrCodeFile: null,
     });
     setIsEditing(false);
   };
@@ -446,6 +457,30 @@ const AdminSettingsPage: React.FC = () => {
                     <p className="text-xs text-emerald-500 mt-1">New file selected: {currentMethod.imageFile.name}</p>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">QR Code Image</label>
+                <div className="flex gap-4 items-center">
+                  {currentMethod.qrCodeUrl && !currentMethod.qrCodeFile && (
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                      <img src={currentMethod.qrCodeUrl} alt="QR Preview" className="w-8 h-8 object-contain" />
+                    </div>
+                  )}
+                  <input 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setCurrentMethod({...currentMethod, qrCodeFile: e.target.files[0]});
+                      }
+                    }}
+                    className="flex-1 w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                  />
+                </div>
+                {currentMethod.qrCodeFile && (
+                  <p className="text-xs text-emerald-500 mt-1">New file selected: {currentMethod.qrCodeFile.name}</p>
+                )}
               </div>
               
               <div>

@@ -39,10 +39,17 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const imageFile = formData.get('imageFile') as File | null;
     let imageUrl = formData.get('imageUrl') as string;
+    const qrCodeFile = formData.get('qrCodeFile') as File | null;
+    let qrCodeUrl = formData.get('qrCodeUrl') as string;
 
     if (imageFile) {
         const blob = await put(`payment-methods/${Date.now()}-${imageFile.name}`, imageFile, { access: 'public' });
         imageUrl = blob.url;
+    }
+
+    if (qrCodeFile) {
+        const blob = await put(`payment-methods/qr-${Date.now()}-${qrCodeFile.name}`, qrCodeFile, { access: 'public' });
+        qrCodeUrl = blob.url;
     }
 
     const body = {
@@ -53,6 +60,7 @@ export async function POST(req: Request) {
         chargesType: formData.get('chargesType'),
         type: formData.get('type'),
         imageUrl: imageUrl,
+        qrCodeUrl: qrCodeUrl,
         walletAddress: formData.get('walletAddress'),
     };
 
@@ -74,10 +82,17 @@ export async function PUT(req: Request) {
     const _id = formData.get('_id');
     const imageFile = formData.get('imageFile') as File | null;
     let imageUrl = formData.get('imageUrl') as string;
+    const qrCodeFile = formData.get('qrCodeFile') as File | null;
+    let qrCodeUrl = formData.get('qrCodeUrl') as string;
 
     if (imageFile) {
         const blob = await put(`payment-methods/${Date.now()}-${imageFile.name}`, imageFile, { access: 'public' });
         imageUrl = blob.url;
+    }
+
+    if (qrCodeFile) {
+        const blob = await put(`payment-methods/qr-${Date.now()}-${qrCodeFile.name}`, qrCodeFile, { access: 'public' });
+        qrCodeUrl = blob.url;
     }
 
     const updateData = {
@@ -88,6 +103,7 @@ export async function PUT(req: Request) {
         chargesType: formData.get('chargesType'),
         type: formData.get('type'),
         imageUrl: imageUrl,
+        qrCodeUrl: qrCodeUrl,
         walletAddress: formData.get('walletAddress'),
     };
     
