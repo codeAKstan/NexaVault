@@ -63,7 +63,7 @@ const DashboardPage: React.FC = () => {
         {[
           { label: "Account Balance", value: `$${(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+2.4%", icon: "account_balance_wallet", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
           { label: "Total Yield Earned", value: `$${(user?.totalInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+$412.00", icon: "savings", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-          { label: "Carbon Offset", value: "12.4 Tons", sub: "Real-time", icon: "eco", color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
+          { label: "Total Invested", value: "0", sub: "Real-time", icon: "eco", color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
           { label: "Active Investments", value: "8 Vaults", sub: "4 Platforms", icon: "layers", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/20" }
         ].map((stat, i) => (
           <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
@@ -206,8 +206,8 @@ const DashboardPage: React.FC = () => {
                       </td>
                       <td className="px-8 py-5">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                          tx.type === 'deposit' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                          tx.type === 'withdrawal' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                          tx.type === 'deposit' || tx.type === 'credit' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                          tx.type === 'withdrawal' || tx.type === 'debit' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
                           'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                         }`}>
                           {tx.type}
@@ -222,8 +222,8 @@ const DashboardPage: React.FC = () => {
                           {tx.status}
                         </span>
                       </td>
-                      <td className={`px-8 py-5 text-right font-bold ${tx.type === 'deposit' ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
-                        {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString()}
+                      <td className={`px-8 py-5 text-right font-bold ${tx.type === 'deposit' || tx.type === 'credit' ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
+                        {tx.type === 'deposit' || tx.type === 'credit' ? '+' : '-'}${tx.amount.toLocaleString()}
                       </td>
                     </tr>
                   ))

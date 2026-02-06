@@ -18,6 +18,8 @@ interface User {
   kycDocuments: { type: string; url: string; uploadedAt: string }[];
   kycRejectionReason?: string;
   totalInvested: number;
+  balance?: number;
+  earnings?: number;
   isSuspended: boolean;
 }
 
@@ -29,6 +31,13 @@ const UserDetailsPage: React.FC = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+
+  // Credit/Debit Modal State
+  const [showCreditDebitModal, setShowCreditDebitModal] = useState(false);
+  const [cdAmount, setCdAmount] = useState('');
+  const [cdType, setCdType] = useState<'credit' | 'debit'>('credit');
+  const [cdField, setCdField] = useState<'balance' | 'earnings'>('balance');
+  const [cdLoading, setCdLoading] = useState(false);
 
   const fetchUser = async () => {
     try {
@@ -108,6 +117,37 @@ const UserDetailsPage: React.FC = () => {
     }
   };
 
+  const handleCreditDebit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cdAmount || Number(cdAmount) <= 0) return;
+
+    setCdLoading(true);
+    try {
+        const res = await fetch(`/api/admin/users/${user?._id}/balance`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: cdAmount,
+                type: cdType,
+                field: cdField
+            }),
+        });
+
+        if (res.ok) {
+            alert(`${cdType === 'credit' ? 'Credited' : 'Debited'} successfully`);
+            setShowCreditDebitModal(false);
+            setCdAmount('');
+            fetchUser(); // Refresh
+        } else {
+            alert('Operation failed');
+        }
+    } catch (error) {
+        console.error('Operation error:', error);
+    } finally {
+        setCdLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -141,7 +181,7 @@ const UserDetailsPage: React.FC = () => {
               <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
             </button>
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-10">
-              <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 first:rounded-t-xl">
+              <button onClick={() => setShowCreditDebitModal(true)} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 first:rounded-t-xl">
                 Credit/Debit User
               </button>
               <button onClick={() => handleAction('login')} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800">
@@ -200,6 +240,14 @@ const UserDetailsPage: React.FC = () => {
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Invested</label>
                 <p className="text-slate-900 dark:text-white font-medium">${(user.totalInvested || 0).toLocaleString()}</p>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Account Balance</label>
+                <p className="text-slate-900 dark:text-white font-medium">${(user.balance || 0).toLocaleString()}</p>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Earnings</label>
+                <p className="text-slate-900 dark:text-white font-medium">${(user.earnings || 0).toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -299,6 +347,95 @@ const UserDetailsPage: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {/* Credit/Debit Modal */}
+      {showCreditDebitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Credit/Debit {user.name} account.</h3>
+                    <button 
+                        onClick={() => setShowCreditDebitModal(false)}
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-gray-500">close</span>
+                    </button>
+                </div>
+
+                <form onSubmit={handleCreditDebit} className="space-y-6">
+                    <div>
+                        <input
+                            type="number"
+                            value={cdAmount}
+                            onChange={(e) => setCdAmount(e.target.value)}
+                            placeholder="Enter amount"
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50 text-gray-900 dark:text-white"
+                            required
+                            min="0.01"
+                            step="0.01"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select where to Credit/Debit</label>
+                        <div className="relative">
+                            <select
+                                value={cdField}
+                                onChange={(e) => setCdField(e.target.value as 'balance' | 'earnings')}
+                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50 appearance-none text-gray-900 dark:text-white"
+                            >
+                                <option value="balance">Account Balance</option>
+                                <option value="earnings">Earnings</option>
+                            </select>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Action Type</label>
+                        <div className="flex gap-4">
+                            <label className={`flex-1 cursor-pointer p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${cdType === 'credit' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'border-gray-200 dark:border-gray-700 text-gray-500'}`}>
+                                <input 
+                                    type="radio" 
+                                    name="cdType" 
+                                    value="credit" 
+                                    checked={cdType === 'credit'} 
+                                    onChange={() => setCdType('credit')}
+                                    className="hidden"
+                                />
+                                <span className="material-symbols-outlined">add_circle</span>
+                                <span className="font-bold">Credit (Add)</span>
+                            </label>
+                            <label className={`flex-1 cursor-pointer p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${cdType === 'debit' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600' : 'border-gray-200 dark:border-gray-700 text-gray-500'}`}>
+                                <input 
+                                    type="radio" 
+                                    name="cdType" 
+                                    value="debit" 
+                                    checked={cdType === 'debit'} 
+                                    onChange={() => setCdType('debit')}
+                                    className="hidden"
+                                />
+                                <span className="material-symbols-outlined">remove_circle</span>
+                                <span className="font-bold">Debit (Subtract)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={cdLoading || !cdAmount}
+                        className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                        {cdLoading ? (
+                            <>
+                                <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                Processing...
+                            </>
+                        ) : 'Confirm Transaction'}
+                    </button>
+                </form>
+            </div>
         </div>
       )}
     </div>

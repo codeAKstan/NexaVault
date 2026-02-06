@@ -22,6 +22,20 @@ const UserManagementPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    username: '',
+    password: '',
+    phone: '',
+    address: '',
+    city: '',
+    zip: '',
+  });
+  const [creating, setCreating] = useState(false);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -53,6 +67,40 @@ const UserManagementPage: React.FC = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewUser(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+
+    try {
+        const res = await fetch('/api/admin/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUser),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert('User created successfully');
+            setIsModalOpen(false);
+            setNewUser({ name: '', email: '', username: '', password: '', phone: '', address: '', city: '', zip: '' });
+            fetchUsers(); // Refresh list
+        } else {
+            alert(data.error || 'Failed to create user');
+        }
+    } catch (error) {
+        console.error('Create user error:', error);
+        alert('An error occurred');
+    } finally {
+        setCreating(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -101,9 +149,12 @@ const UserManagementPage: React.FC = () => {
               className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-            <span className="material-symbols-outlined text-sm">filter_list</span>
-            Filters
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            <span className="material-symbols-outlined text-sm">add</span>
+            New User
           </button>
         </div>
       </div>
@@ -230,6 +281,142 @@ const UserManagementPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* New User Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl p-8 shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New User</h2>
+                    <button 
+                        onClick={() => setIsModalOpen(false)}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-gray-500">close</span>
+                    </button>
+                </div>
+
+                <form onSubmit={handleCreateUser} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Full Name</label>
+                            <input
+                                type="text"
+                                name="name"
+                                required
+                                value={newUser.name}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="John Doe"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                required
+                                value={newUser.username}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="johndoe123"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Email Address</label>
+                            <input
+                                type="email"
+                                name="email"
+                                required
+                                value={newUser.email}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="john@example.com"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                required
+                                value={newUser.password}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="••••••••"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Phone Number</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                value={newUser.phone}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="+1 (555) 000-0000"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">Address</label>
+                            <input
+                                type="text"
+                                name="address"
+                                value={newUser.address}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="123 Main St"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">City</label>
+                            <input
+                                type="text"
+                                name="city"
+                                value={newUser.city}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="New York"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">ZIP Code</label>
+                            <input
+                                type="text"
+                                name="zip"
+                                value={newUser.zip}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50"
+                                placeholder="10001"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 gap-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={creating}
+                            className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                        >
+                            {creating ? (
+                                <>
+                                    <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                                    Creating...
+                                </>
+                            ) : 'Create User'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
