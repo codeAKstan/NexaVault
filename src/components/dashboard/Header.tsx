@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -50,15 +51,15 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         
         <div className="h-8 w-[1px] bg-gray-200 dark:bg-gray-800"></div>
 
-        <div className="flex items-center gap-3">
+        <Link href="/dashboard/profile" className="flex items-center gap-3 group">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-gray-900 dark:text-white">{user?.name || 'User'}</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-emerald-500 transition-colors">{user?.name || 'User'}</p>
             <p className="text-xs text-gray-500">@{user?.username || 'Username'}</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden group-hover:border-emerald-500 transition-colors">
              <img src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=10b981&color=fff`} alt="Profile" />
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

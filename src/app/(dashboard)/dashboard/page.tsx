@@ -56,16 +56,36 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
           
-          <div className="h-64 flex items-end justify-between gap-2">
-            {/* Mock Chart Bars */}
-            {[30, 45, 35, 55, 40, 60, 50, 75, 65, 85, 70, 95].map((h, i) => (
-               <div key={i} className="w-full bg-emerald-50 dark:bg-emerald-900/10 rounded-t-xl relative group">
-                  <div 
-                    className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary to-emerald-400 rounded-t-xl transition-all duration-500 group-hover:opacity-80"
-                    style={{ height: `${h}%` }}
-                  ></div>
-               </div>
-            ))}
+          <div className="h-64 relative group">
+            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0,90 C10,85 20,80 30,75 C40,70 50,55 60,60 C70,65 80,45 90,30 L100,25 L100,100 L0,100 Z"
+                fill="url(#gradient)"
+                className="opacity-0 animate-[fadeIn_1.5s_ease-out_forwards]"
+              />
+              <path
+                d="M0,90 C10,85 20,80 30,75 C40,70 50,55 60,60 C70,65 80,45 90,30 L100,25"
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="0.8"
+                strokeLinecap="round"
+                className="[stroke-dasharray:300] [stroke-dashoffset:300] animate-[drawPath_2s_ease-out_forwards]"
+              />
+            </svg>
+            <style jsx>{`
+              @keyframes drawPath {
+                to { stroke-dashoffset: 0; }
+              }
+              @keyframes fadeIn {
+                to { opacity: 1; }
+              }
+            `}</style>
           </div>
           <div className="flex justify-between mt-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
             <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
