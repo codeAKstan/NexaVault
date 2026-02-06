@@ -23,7 +23,6 @@ export default function DashboardLayout({
         <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8">
           Your account has been suspended due to a violation of our terms of service or suspicious activity. Please contact the administrator for more information.
         </p>
-       
       </div>
     );
   }
