@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface PaymentMethod {
   _id: string;
@@ -18,6 +19,7 @@ interface PaymentMethod {
 }
 
 const DepositPage: React.FC = () => {
+  const router = useRouter();
   const [amount, setAmount] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -25,6 +27,13 @@ const DepositPage: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  
+  // Payment Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPaymentMethods();
@@ -72,9 +81,46 @@ const DepositPage: React.FC = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProofFile(file);
+      setProofPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmitPayment = async () => {
+    if (!amount || !selectedMethod || !proofFile) return;
+
+    setSubmitting(true);
+    const formData = new FormData();
+    formData.append('amount', amount);
+    formData.append('paymentMethod', JSON.stringify(selectedMethod));
+    formData.append('proofImage', proofFile);
+
+    try {
+      const res = await fetch('/api/user/deposit', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        router.push('/dashboard/history'); // Changed from /dashboard/transactions to /dashboard/history based on search findings
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Payment submission failed');
+      }
+    } catch (error) {
+      console.error('Payment submission error:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (showDetails && selectedMethod) {
     return (
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-8 relative">
         <div>
           <button
             onClick={() => setShowDetails(false)}
@@ -162,13 +208,95 @@ const DepositPage: React.FC = () => {
 
           <div className="flex justify-end pt-4">
             <button
-              onClick={() => window.location.href = '/dashboard/transactions'}
+              onClick={() => setIsModalOpen(true)}
               className="bg-primary text-white font-bold px-8 py-3.5 rounded-full hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
             >
               I have made the payment
             </button>
           </div>
         </div>
+
+        {/* Payment Confirmation Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Confirm Payment</h2>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-gray-500">close</span>
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex justify-between items-center">
+                  <span className="text-sm text-emerald-800 dark:text-emerald-400 font-medium">Amount Sent</span>
+                  <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">${Number(amount).toLocaleString()}</span>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+                    Upload Transaction Proof
+                  </label>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Please upload a screenshot or photo of your payment receipt.
+                  </p>
+                  
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                      proofPreview ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                  >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                      className="hidden" 
+                      accept="image/*"
+                    />
+                    
+                    {proofPreview ? (
+                      <div className="relative w-full h-48">
+                        <Image 
+                          src={proofPreview} 
+                          alt="Proof Preview" 
+                          fill 
+                          className="object-contain rounded-lg"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                          <span className="text-white font-medium bg-black/50 px-3 py-1 rounded-full">Change Image</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">cloud_upload</span>
+                        <span className="text-sm text-gray-500 font-medium">Click to upload image</span>
+                        <span className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG (Max 5MB)</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSubmitPayment}
+                  disabled={submitting || !proofFile}
+                  className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {submitting ? (
+                    <>
+                      <span className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                      Submitting...
+                    </>
+                  ) : 'Submit Payment Proof'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -259,7 +387,10 @@ const DepositPage: React.FC = () => {
         </button>
 
         <div className="mt-8">
-          <button className="text-emerald-500 text-sm font-medium hover:text-emerald-600 hover:underline">
+          <button 
+            onClick={() => router.push('/dashboard/history')}
+            className="text-emerald-500 text-sm font-medium hover:text-emerald-600 hover:underline"
+          >
             View deposit history
           </button>
         </div>

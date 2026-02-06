@@ -1,10 +1,51 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import Link from 'next/link';
+
+interface Transaction {
+  _id: string;
+  type: string;
+  amount: number;
+  status: string;
+  paymentMethod: {
+    name: string;
+    imageUrl?: string;
+  };
+  createdAt: string;
+}
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecentTransactions();
+  }, []);
+
+  const fetchRecentTransactions = async () => {
+    try {
+      const res = await fetch('/api/user/transactions');
+      const data = await res.json();
+      if (res.ok) {
+        setRecentTransactions(data.transactions.slice(0, 5)); // Get top 5 recent
+      }
+    } catch (error) {
+      console.error('Failed to fetch transactions', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
   if (user?.isSuspended) {
     return null; // Handled by layout
@@ -20,8 +61,8 @@ const DashboardPage: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {[
-          { label: "Account Balance", value: "$24,081.00", change: "+2.4%", icon: "account_balance_wallet", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
-          { label: "Total Yield Earned", value: "$1,281.45", change: "+$412.00", icon: "savings", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+          { label: "Account Balance", value: `$${(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+2.4%", icon: "account_balance_wallet", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
+          { label: "Total Yield Earned", value: `$${(user?.totalInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+$412.00", icon: "savings", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
           { label: "Carbon Offset", value: "12.4 Tons", sub: "Real-time", icon: "eco", color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
           { label: "Active Investments", value: "8 Vaults", sub: "4 Platforms", icon: "layers", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/20" }
         ].map((stat, i) => (
@@ -132,48 +173,61 @@ const DashboardPage: React.FC = () => {
         <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="p-8 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
             <h3 className="font-bold text-lg text-gray-900 dark:text-white">Recent Transactions</h3>
-            <button className="text-sm font-bold text-primary hover:text-emerald-600">View All</button>
+            <Link href="/dashboard/history" className="text-sm font-bold text-primary hover:text-emerald-600">View All</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50 dark:bg-slate-800/50 text-xs uppercase text-gray-500 font-bold tracking-wider">
                   <th className="px-8 py-4">Date</th>
-                  <th className="px-8 py-4">Asset</th>
+                  <th className="px-8 py-4">Method</th>
                   <th className="px-8 py-4">Type</th>
+                  <th className="px-8 py-4">Status</th>
                   <th className="px-8 py-4 text-right">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {[
-                  { date: "Oct 24, 2023", asset: "ETH", type: "Yield", amount: "+$124.50", icon: "currency_bitcoin", color: "bg-blue-100 text-blue-600" },
-                  { date: "Oct 22, 2023", asset: "USDC", type: "Deposit", amount: "$2,500.00", icon: "attach_money", color: "bg-green-100 text-green-600" },
-                  { date: "Oct 18, 2023", asset: "SOL", type: "Stake", amount: "-$450.00", icon: "token", color: "bg-purple-100 text-purple-600" },
-                ].map((tx, i) => (
-                  <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-8 py-5 text-sm text-gray-600 dark:text-gray-400">{tx.date}</td>
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full ${tx.color} bg-opacity-20 flex items-center justify-center`}>
-                          <span className="material-symbols-outlined text-sm">{tx.icon}</span>
-                        </div>
-                        <span className="font-bold text-gray-900 dark:text-white">{tx.asset}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                        tx.type === 'Yield' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                        tx.type === 'Deposit' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                        'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                      }`}>
-                        {tx.type}
-                      </span>
-                    </td>
-                    <td className={`px-8 py-5 text-right font-bold ${tx.amount.startsWith('+') ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
-                      {tx.amount}
-                    </td>
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-5 text-center text-gray-500">Loading transactions...</td>
                   </tr>
-                ))}
+                ) : recentTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-5 text-center text-gray-500">No recent transactions</td>
+                  </tr>
+                ) : (
+                  recentTransactions.map((tx) => (
+                    <tr key={tx._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="px-8 py-5 text-sm text-gray-600 dark:text-gray-400">{formatDate(tx.createdAt)}</td>
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-gray-900 dark:text-white">{tx.paymentMethod?.name || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          tx.type === 'deposit' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                          tx.type === 'withdrawal' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                          'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                        }`}>
+                          {tx.type}
+                        </span>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
+                          tx.status === 'approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                          tx.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                          'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        }`}>
+                          {tx.status}
+                        </span>
+                      </td>
+                      <td className={`px-8 py-5 text-right font-bold ${tx.type === 'deposit' ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}`}>
+                        {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

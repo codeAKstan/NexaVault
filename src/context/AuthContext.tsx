@@ -8,6 +8,8 @@ interface User {
   name: string;
   email: string;
   username: string;
+  balance?: number;
+  totalInvested?: number;
 }
 
 interface AuthContextType {
