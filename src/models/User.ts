@@ -46,6 +46,18 @@ const UserSchema = new mongoose.Schema({
     enum: ['verified', 'pending', 'rejected', 'unverified'],
     default: 'unverified',
   },
+  kycDocuments: [{
+    type: { type: String, enum: ['id', 'address', 'other'] },
+    url: String,
+    uploadedAt: { type: Date, default: Date.now }
+  }],
+  kycRejectionReason: {
+    type: String,
+    default: '',
+  },
+  kycSubmittedAt: {
+    type: Date,
+  },
   walletAddress: {
     type: String,
     default: '',
@@ -59,5 +71,12 @@ const UserSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Force model recompilation in development to pick up schema changes
+if (process.env.NODE_ENV === 'development') {
+  if (mongoose.models.User) {
+    delete mongoose.models.User;
+  }
+}
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

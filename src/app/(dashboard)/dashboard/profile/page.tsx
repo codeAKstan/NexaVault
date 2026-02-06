@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
 
 const ProfilePage: React.FC = () => {
@@ -25,6 +25,16 @@ const ProfilePage: React.FC = () => {
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+  // KYC State
+  const [kycFiles, setKycFiles] = useState<{idDocument: File | null, addressDocument: File | null}>({
+    idDocument: null,
+    addressDocument: null
+  });
+  const [kycLoading, setKycLoading] = useState(false);
+  const [kycMessage, setKycMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  const idInputRef = useRef<HTMLInputElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -94,6 +104,45 @@ const ProfilePage: React.FC = () => {
       setPasswordMessage({ type: 'error', text: err.message });
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleKycSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setKycLoading(true);
+    setKycMessage(null);
+
+    if (!kycFiles.idDocument || !kycFiles.addressDocument) {
+      setKycMessage({ type: 'error', text: 'Please upload both documents' });
+      setKycLoading(false);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('idDocument', kycFiles.idDocument);
+    formData.append('addressDocument', kycFiles.addressDocument);
+
+    try {
+      const res = await fetch('/api/user/kyc', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit KYC');
+
+      setKycMessage({ type: 'success', text: 'KYC submitted successfully. Status: Pending Approval.' });
+      await checkAuth();
+    } catch (err: any) {
+      setKycMessage({ type: 'error', text: err.message });
+    } finally {
+      setKycLoading(false);
+    }
+  };
+
+  const handleFileChange = (type: 'idDocument' | 'addressDocument', e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setKycFiles(prev => ({ ...prev, [type]: e.target.files![0] }));
     }
   };
 
@@ -240,103 +289,154 @@ const ProfilePage: React.FC = () => {
       default:
         return (
           <>
-            {/* Verification Status */}
-            <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-2xl p-6 flex items-center justify-between mb-8">
+            {/* KYC Status Banner */}
+            <div className={`border rounded-2xl p-6 flex items-center justify-between mb-8 ${
+              user?.kycStatus === 'verified' 
+                ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30'
+                : user?.kycStatus === 'pending'
+                ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800/30'
+                : user?.kycStatus === 'rejected'
+                ? 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-800/30'
+                : 'bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-800/30'
+            }`}>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500">
-                  <span className="material-symbols-outlined">check_circle</span>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  user?.kycStatus === 'verified' 
+                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500'
+                    : user?.kycStatus === 'pending'
+                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500'
+                    : user?.kycStatus === 'rejected'
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-500'
+                    : 'bg-blue-100 dark:bg-blue-900/30 text-blue-500'
+                }`}>
+                  <span className="material-symbols-outlined">
+                    {user?.kycStatus === 'verified' ? 'check_circle' : 
+                     user?.kycStatus === 'pending' ? 'hourglass_top' :
+                     user?.kycStatus === 'rejected' ? 'cancel' : 'info'}
+                  </span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">Identity Verified</h3>
-                  <p className="text-emerald-600 dark:text-emerald-400 text-xs mt-0.5">Your KYC documentation has been approved and your limits have been increased.</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">
+                    {user?.kycStatus === 'verified' ? 'Identity Verified' : 
+                     user?.kycStatus === 'pending' ? 'Verification Pending' :
+                     user?.kycStatus === 'rejected' ? 'Verification Rejected' : 'Verification Required'}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-xs mt-0.5">
+                    {user?.kycStatus === 'verified' ? 'Your KYC documentation has been approved.' : 
+                     user?.kycStatus === 'pending' ? 'Your documents are currently being reviewed by our team.' :
+                     user?.kycStatus === 'rejected' ? user?.kycRejectionReason || 'Your documents were rejected. Please try again.' : 'Please submit your documents to verify your identity.'}
+                  </p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-lg uppercase tracking-wider">Verified</span>
+              <span className={`px-3 py-1 text-xs font-bold rounded-lg uppercase tracking-wider ${
+                user?.kycStatus === 'verified' ? 'bg-emerald-500 text-white' : 
+                user?.kycStatus === 'pending' ? 'bg-amber-500 text-white' :
+                user?.kycStatus === 'rejected' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+              }`}>
+                {user?.kycStatus || 'Unverified'}
+              </span>
             </div>
 
-            {/* Verified Information */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm mb-8">
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">Verified Information</h3>
-                <span className="text-xs text-gray-400 italic flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">lock</span> Locked after verification
-                </span>
-              </div>
+            {/* KYC Submission Form */}
+            {(!user?.kycStatus || user?.kycStatus === 'unverified' || user?.kycStatus === 'rejected') && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm mb-8">
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-6">Submit Verification Documents</h3>
+                
+                {kycMessage && (
+                  <div className={`mb-6 p-4 rounded-xl text-sm font-medium ${
+                    kycMessage.type === 'success' 
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' 
+                      : 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                  }`}>
+                    {kycMessage.text}
+                  </div>
+                )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
-                  <p className="text-gray-900 dark:text-white font-medium">{user?.name || 'User Name'}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Date of Birth</label>
-                  <p className="text-gray-900 dark:text-white font-medium">May 14, 1994</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nationality</label>
-                  <p className="text-gray-900 dark:text-white font-medium">Sri Lankan</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tax Residency</label>
-                  <p className="text-gray-900 dark:text-white font-medium">European Union (Estonia)</p>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Residential Address</label>
-                  <p className="text-gray-900 dark:text-white font-medium">{user?.address || 'Veski 1, 10112 Tallinn, Estonia'}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Verification Documents */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
-              <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-8">Verification Documents</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between border border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-500">
-                      <span className="material-symbols-outlined">assignment_ind</span>
-                    </div>
+                <form onSubmit={handleKycSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white text-sm">Government ID</p>
-                      <p className="text-xs text-gray-400">Passport_Anuda_J.pdf</p>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Government ID (Passport/Driving License)</label>
+                      <div 
+                        onClick={() => idInputRef.current?.click()}
+                        className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
+                      >
+                        <span className="material-symbols-outlined text-3xl text-gray-400 mb-2">upload_file</span>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          {kycFiles.idDocument ? kycFiles.idDocument.name : 'Click to upload ID Document'}
+                        </p>
+                        <input 
+                          type="file" 
+                          ref={idInputRef}
+                          className="hidden" 
+                          onChange={(e) => handleFileChange('idDocument', e)}
+                          accept="image/*,.pdf"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Proof of Address (Utility Bill/Bank Statement)</label>
+                      <div 
+                        onClick={() => addressInputRef.current?.click()}
+                        className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
+                      >
+                        <span className="material-symbols-outlined text-3xl text-gray-400 mb-2">upload_file</span>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                          {kycFiles.addressDocument ? kycFiles.addressDocument.name : 'Click to upload Address Proof'}
+                        </p>
+                        <input 
+                          type="file" 
+                          ref={addressInputRef}
+                          className="hidden" 
+                          onChange={(e) => handleFileChange('addressDocument', e)}
+                          accept="image/*,.pdf"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 text-xs font-bold text-emerald-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                    View
-                  </button>
-                </div>
 
-                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between border border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-500">
-                      <span className="material-symbols-outlined">home_pin</span>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900 dark:text-white text-sm">Proof of Address</p>
-                      <p className="text-xs text-gray-400">Utility_Bill_Oct23.pdf</p>
-                    </div>
+                  <div className="flex justify-end">
+                    <button 
+                      type="submit" 
+                      disabled={kycLoading}
+                      className="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {kycLoading ? 'Submitting...' : 'Submit Documents'}
+                    </button>
                   </div>
-                  <button className="px-3 py-1.5 text-xs font-bold text-emerald-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                    View
-                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Read-only View for Pending/Verified */}
+            {(user?.kycStatus === 'pending' || user?.kycStatus === 'verified') && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm mb-8">
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-8">Submitted Documents</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {user?.kycDocuments?.map((doc: any, index: number) => (
+                    <div key={index} className="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between border border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-500">
+                          <span className="material-symbols-outlined">description</span>
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900 dark:text-white text-sm uppercase">{doc.type}</p>
+                          <p className="text-xs text-gray-400">Uploaded on {new Date(doc.uploadedAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <a 
+                        href={doc.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 text-xs font-bold text-emerald-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                      >
+                        View
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4">
-              <p className="text-xs text-gray-400 max-w-md">
-                Last updated on Oct 24, 2023. You can update your information if your details have changed.
-              </p>
-              <div className="flex gap-4">
-                <button className="px-6 py-3 rounded-xl font-bold text-sm bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
-                  Download Report
-                </button>
-                <button className="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">
-                  Update Information
-                </button>
-              </div>
-            </div>
+            )}
           </>
         );
     }
