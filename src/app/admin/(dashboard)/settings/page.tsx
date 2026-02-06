@@ -55,6 +55,14 @@ const AdminSettingsPage: React.FC = () => {
     confirmPassword: '',
   });
 
+  // Admin Management
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [newAdmin, setNewAdmin] = useState({
+    email: '',
+    password: '',
+    role: 'admin',
+  });
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -78,6 +86,13 @@ const AdminSettingsPage: React.FC = () => {
       const dataMethods = await resMethods.json();
       if (resMethods.ok) {
         setPaymentMethods(dataMethods.methods);
+      }
+
+      // Fetch Admins
+      const resAdmins = await fetch('/api/admin/settings/admins');
+      const dataAdmins = await resAdmins.json();
+      if (resAdmins.ok) {
+        setAdmins(dataAdmins.admins);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -195,6 +210,35 @@ const AdminSettingsPage: React.FC = () => {
     }
   };
 
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+
+    try {
+        const res = await fetch('/api/admin/settings/admins', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newAdmin),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setMessage({ type: 'success', text: 'New admin added successfully' });
+            setNewAdmin({ email: '', password: '', role: 'admin' });
+            fetchData(); // Refresh list
+        } else {
+            setMessage({ type: 'error', text: data.error || 'Failed to add admin' });
+        }
+    } catch (error) {
+        console.error('Add admin error:', error);
+        setMessage({ type: 'error', text: 'An error occurred' });
+    } finally {
+        setSaving(false);
+    }
+  };
+
   const handleDeleteMethod = async (id: string) => {
     if (!confirm('Are you sure you want to delete this payment method?')) return;
     
@@ -247,8 +291,8 @@ const AdminSettingsPage: React.FC = () => {
 
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-800 mb-8">
-        <div className="flex gap-8">
-          {['General', 'Payment Settings', 'Security'].map((tab) => (
+        <div className="flex gap-8 overflow-x-auto pb-1">
+          {['General', 'Payment Settings', 'Security', 'Manage Admins'].map((tab) => (
             <button 
               key={tab}
               onClick={() => { setActiveTab(tab); setMessage(null); }}
@@ -445,6 +489,103 @@ const AdminSettingsPage: React.FC = () => {
             </button>
           </div>
         </form>
+      )}
+
+      {activeTab === 'Manage Admins' && (
+        <div className="space-y-8">
+            {/* Add Admin Form */}
+            <form onSubmit={handleAddAdmin} className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm space-y-6 max-w-3xl">
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Add New Administrator</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            required
+                            value={newAdmin.email}
+                            onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            placeholder="admin@example.com"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                        <input 
+                            type="password" 
+                            required
+                            value={newAdmin.password}
+                            onChange={(e) => setNewAdmin({...newAdmin, password: e.target.value})}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            placeholder="••••••••"
+                            minLength={6}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+                        <select 
+                            value={newAdmin.role}
+                            onChange={(e) => setNewAdmin({...newAdmin, role: e.target.value})}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                        >
+                            <option value="admin">Admin</option>
+                            <option value="super_admin">Super Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <button 
+                        type="submit" 
+                        disabled={saving}
+                        className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                        {saving ? 'Adding...' : 'Add Admin'}
+                    </button>
+                </div>
+            </form>
+
+            {/* Admin List */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white">Existing Administrators</h3>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-gray-50 dark:bg-slate-800/50 text-xs uppercase font-bold text-gray-400 tracking-wider">
+                                <th className="px-6 py-4">Email</th>
+                                <th className="px-6 py-4">Role</th>
+                                <th className="px-6 py-4">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                            {admins.length === 0 ? (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">No admins found.</td>
+                                </tr>
+                            ) : (
+                                admins.map((admin) => (
+                                    <tr key={admin._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">{admin.email}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                                                admin.role === 'super_admin' 
+                                                    ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' 
+                                                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                                            }`}>
+                                                {admin.role.replace('_', ' ')}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-500 text-sm">
+                                            {new Date(admin.createdAt).toLocaleDateString()}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
       )}
 
       {/* Modal */}
