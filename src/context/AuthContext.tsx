@@ -10,6 +10,7 @@ interface User {
   username: string;
   balance?: number;
   totalInvested?: number;
+  earnings?: number;
 }
 
 interface AuthContextType {

@@ -20,7 +20,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const { amount, type, field } = await req.json(); // type: 'credit' | 'debit', field: 'balance' | 'earnings'
+    const { amount, type, field } = await req.json(); // type: 'credit' | 'debit', field: 'balance' | 'earnings' | 'totalInvested'
 
     if (!amount || !type || !field) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -39,8 +39,11 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     }
 
     // Determine target field
-    // Note: 'earnings' was recently added to schema. 'balance' exists.
-    const targetField = field === 'earnings' ? 'earnings' : 'balance';
+    // Note: 'earnings' and 'totalInvested' were recently added to schema. 'balance' exists.
+    let targetField = field;
+    if (field !== 'earnings' && field !== 'totalInvested' && field !== 'balance') {
+        targetField = 'balance'; // Fallback
+    }
     
     // Apply operation
     if (type === 'credit') {

@@ -36,7 +36,7 @@ const UserDetailsPage: React.FC = () => {
   const [showCreditDebitModal, setShowCreditDebitModal] = useState(false);
   const [cdAmount, setCdAmount] = useState('');
   const [cdType, setCdType] = useState<'credit' | 'debit'>('credit');
-  const [cdField, setCdField] = useState<'balance' | 'earnings'>('balance');
+  const [cdField, setCdField] = useState<'balance' | 'earnings' | 'totalInvested'>('balance');
   const [cdLoading, setCdLoading] = useState(false);
 
   const fetchUser = async () => {
@@ -382,11 +382,12 @@ const UserDetailsPage: React.FC = () => {
                         <div className="relative">
                             <select
                                 value={cdField}
-                                onChange={(e) => setCdField(e.target.value as 'balance' | 'earnings')}
+                                onChange={(e) => setCdField(e.target.value as 'balance' | 'earnings' | 'totalInvested')}
                                 className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/50 appearance-none text-gray-900 dark:text-white"
                             >
                                 <option value="balance">Account Balance</option>
                                 <option value="earnings">Earnings</option>
+                                <option value="totalInvested">Total Invested</option>
                             </select>
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 pointer-events-none">expand_more</span>
                         </div>

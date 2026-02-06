@@ -62,8 +62,8 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {[
           { label: "Account Balance", value: `$${(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+2.4%", icon: "account_balance_wallet", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
-          { label: "Total Yield Earned", value: `$${(user?.totalInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+$412.00", icon: "savings", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-          { label: "Total Invested", value: "0", sub: "Real-time", icon: "eco", color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
+          { label: "Total Yield Earned", value: `$${(user?.earnings || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, change: "+$412.00", icon: "savings", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+          { label: "Total Invested", value: `$${(user?.totalInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, sub: "Real-time", icon: "eco", color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
           { label: "Active Investments", value: "8 Vaults", sub: "4 Platforms", icon: "layers", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/20" }
         ].map((stat, i) => (
           <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
