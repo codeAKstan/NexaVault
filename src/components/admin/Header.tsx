@@ -3,13 +3,24 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 
-const AdminHeader: React.FC = () => {
+interface AdminHeaderProps {
+  onMenuClick: () => void;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-8 sticky top-0 z-40 ml-64">
-      <div className="flex-1 max-w-xl">
-        <div className="relative">
+    <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40 lg:ml-64 transition-all duration-300">
+      <div className="flex items-center gap-4 flex-1 max-w-xl">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+
+        <div className="relative w-full hidden md:block">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 material-symbols-outlined text-xl">search</span>
           <input
             type="text"
@@ -19,7 +30,7 @@ const AdminHeader: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2 lg:gap-6">
         <button
           onClick={toggleTheme}
           className="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"
@@ -34,7 +45,7 @@ const AdminHeader: React.FC = () => {
           <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
         </button>
 
-        <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+        <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2 hidden md:block"></div>
 
         <div className="flex items-center gap-3">
           <div className="text-right hidden md:block">

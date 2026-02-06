@@ -130,7 +130,7 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 p-4 rounded-2xl bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-800/30">
                  <div className="flex items-center gap-2 mb-2">
                   <span className="material-symbols-outlined text-orange-500 text-sm">solar_power</span>
@@ -159,52 +159,54 @@ const AdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* User Activity Log */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">User Activity Log</h3>
             <button className="text-emerald-500 text-sm font-bold hover:underline">Download Report</button>
           </div>
 
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800">
-                <th className="pb-4">User</th>
-                <th className="pb-4">Action</th>
-                <th className="pb-4">Vault/Asset</th>
-                <th className="pb-4 text-right">Time</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {[
-                { user: 'Jason Statham', initials: 'JS', action: 'Deposit', type: 'VAULT', asset: 'Solar Fund #02', time: '2 mins ago' },
-                { user: 'New User', initials: 'NU', icon: 'person_add', action: 'Registration', type: 'ONBOARDING', asset: 'Standard Profile', time: '14 mins ago' },
-                { user: 'Elena Marks', initials: 'EM', action: 'Withdraw', type: 'WITHDRAWAL', asset: 'ETH Liquidity Pool', time: '42 mins ago' },
-              ].map((item, i) => (
-                <tr key={i}>
-                  <td className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${item.icon ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
-                        {item.icon ? <span className="material-symbols-outlined text-sm">{item.icon}</span> : item.initials}
-                      </div>
-                      <span className="font-bold text-slate-900 dark:text-white">{item.user}</span>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                      item.type === 'VAULT' ? 'bg-emerald-100 text-emerald-600' :
-                      item.type === 'ONBOARDING' ? 'bg-blue-100 text-blue-600' :
-                      'bg-purple-100 text-purple-600'
-                    }`}>
-                      {item.type}
-                    </span>
-                    <div className="text-xs font-bold text-slate-700 dark:text-gray-300 mt-1">{item.action}</div>
-                  </td>
-                  <td className="py-4 text-sm text-gray-500">{item.asset}</td>
-                  <td className="py-4 text-right text-xs text-gray-400 font-medium">{item.time}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px]">
+              <thead>
+                <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800">
+                  <th className="pb-4">User</th>
+                  <th className="pb-4">Action</th>
+                  <th className="pb-4">Vault/Asset</th>
+                  <th className="pb-4 text-right">Time</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {[
+                  { user: 'Jason Statham', initials: 'JS', action: 'Deposit', type: 'VAULT', asset: 'Solar Fund #02', time: '2 mins ago' },
+                  { user: 'New User', initials: 'NU', icon: 'person_add', action: 'Registration', type: 'ONBOARDING', asset: 'Standard Profile', time: '14 mins ago' },
+                  { user: 'Elena Marks', initials: 'EM', action: 'Withdraw', type: 'WITHDRAWAL', asset: 'ETH Liquidity Pool', time: '42 mins ago' },
+                ].map((item, i) => (
+                  <tr key={i}>
+                    <td className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${item.icon ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
+                          {item.icon ? <span className="material-symbols-outlined text-sm">{item.icon}</span> : item.initials}
+                        </div>
+                        <span className="font-bold text-slate-900 dark:text-white">{item.user}</span>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                        item.type === 'VAULT' ? 'bg-emerald-100 text-emerald-600' :
+                        item.type === 'ONBOARDING' ? 'bg-blue-100 text-blue-600' :
+                        'bg-purple-100 text-purple-600'
+                      }`}>
+                        {item.type}
+                      </span>
+                      <div className="text-xs font-bold text-slate-700 dark:text-gray-300 mt-1">{item.action}</div>
+                    </td>
+                    <td className="py-4 text-sm text-gray-500">{item.asset}</td>
+                    <td className="py-4 text-right text-xs text-gray-400 font-medium">{item.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* System Health */}
