@@ -18,6 +18,7 @@ interface User {
   kycDocuments: { type: string; url: string; uploadedAt: string }[];
   kycRejectionReason?: string;
   totalInvested: number;
+  isSuspended: boolean;
 }
 
 const UserDetailsPage: React.FC = () => {
@@ -46,6 +47,41 @@ const UserDetailsPage: React.FC = () => {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  const handleAction = async (action: 'suspend' | 'delete' | 'login') => {
+    if (action === 'delete' && !confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/users/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?._id,
+          action,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (action === 'delete') {
+          router.push('/admin/users');
+        } else if (action === 'login') {
+          // Open dashboard in new tab
+          window.open('/dashboard', '_blank');
+        } else {
+          fetchUser(); // Refresh for suspend/activate
+        }
+      } else {
+        alert(data.error || 'Action failed');
+      }
+    } catch (error) {
+      console.error('Action error:', error);
+      alert('Failed to perform action');
+    }
+  };
 
   const handleKycAction = async (status: 'verified' | 'rejected') => {
     setActionLoading(true);
@@ -97,13 +133,40 @@ const UserDetailsPage: React.FC = () => {
             <p className="text-sm text-gray-500">User ID: {user._id}</p>
           </div>
         </div>
-        <div className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider ${
-          user.kycStatus === 'verified' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
-          user.kycStatus === 'pending' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
-          user.kycStatus === 'rejected' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
-          'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-        }`}>
-          {user.kycStatus}
+        
+        <div className="flex items-center gap-4">
+          <div className="relative group">
+            <button className="px-4 py-2 bg-indigo-500 text-white text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-indigo-600 transition-colors">
+              Actions
+              <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+            </button>
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-10">
+              <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 first:rounded-t-xl">
+                Credit/Debit User
+              </button>
+              <button onClick={() => handleAction('login')} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800">
+                Login as User
+              </button>
+              <button onClick={() => handleAction('suspend')} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800">
+                {user.isSuspended ? 'Activate User' : 'Suspend User'}
+              </button>
+              <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800">
+                Send Email
+              </button>
+              <button onClick={() => handleAction('delete')} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 last:rounded-b-xl">
+                Delete User
+              </button>
+            </div>
+          </div>
+
+          <div className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider ${
+            user.kycStatus === 'verified' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
+            user.kycStatus === 'pending' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
+            user.kycStatus === 'rejected' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+            'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+          }`}>
+            {user.kycStatus}
+          </div>
         </div>
       </div>
 

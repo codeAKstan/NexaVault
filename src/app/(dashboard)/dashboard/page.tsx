@@ -6,6 +6,10 @@ import { useAuth } from '../../../context/AuthContext';
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
 
+  if (user?.isSuspended) {
+    return null; // Handled by layout
+  }
+
   return (
     <div className="space-y-8">
       <div>
