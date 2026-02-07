@@ -1,8 +1,36 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AdminDashboard: React.FC = () => {
+  const [stats, setStats] = useState({
+    tvl: 0,
+    activeInvestors: 0,
+    totalUsers: 0,
+    carbonOffset: '0'
+  });
+  const [activity, setActivity] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch('/api/admin/dashboard/stats');
+      const data = await res.json();
+      if (res.ok) {
+        setStats(data.stats);
+        setActivity(data.activity);
+      }
+    } catch (error) {
+      console.error('Failed to fetch admin stats', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
@@ -13,11 +41,13 @@ const AdminDashboard: React.FC = () => {
               <span className="material-symbols-outlined">account_balance_wallet</span>
             </div>
             <span className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">trending_up</span> +1.2%
+              <span className="material-symbols-outlined text-sm">trending_up</span> Live
             </span>
           </div>
           <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Total Platform TVL</p>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$128,492,001.40</h3>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {loading ? '...' : `$${stats.tvl.toLocaleString()}`}
+          </h3>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
@@ -26,11 +56,13 @@ const AdminDashboard: React.FC = () => {
               <span className="material-symbols-outlined">group</span>
             </div>
             <span className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">trending_up</span> +84
+              <span className="material-symbols-outlined text-sm">trending_up</span> Real-time
             </span>
           </div>
           <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Active Investors</p>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">14,208</h3>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {loading ? '...' : stats.activeInvestors.toLocaleString()}
+          </h3>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
@@ -38,21 +70,25 @@ const AdminDashboard: React.FC = () => {
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center text-green-600">
               <span className="material-symbols-outlined">eco</span>
             </div>
-            <span className="text-xs text-gray-400">Annual</span>
+            <span className="text-xs text-gray-400">Est. Impact</span>
           </div>
           <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Total Carbon Offset</p>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">1,842.5 Tons</h3>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {loading ? '...' : `${stats.carbonOffset} Tons`}
+          </h3>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-amber-100 dark:border-amber-900/30 ring-1 ring-amber-500/10">
           <div className="flex justify-between items-start mb-4">
             <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-500">
-              <span className="material-symbols-outlined">verified_user</span>
+              <span className="material-symbols-outlined">person</span>
             </div>
             <div className="w-2 h-2 rounded-full bg-amber-500"></div>
           </div>
-          <p className="text-amber-600/70 dark:text-amber-500/70 text-xs font-bold uppercase tracking-wider mb-1">Pending KYC</p>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">248</h3>
+          <p className="text-amber-600/70 dark:text-amber-500/70 text-xs font-bold uppercase tracking-wider mb-1">Total Users</p>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {loading ? '...' : stats.totalUsers.toLocaleString()}
+          </h3>
         </div>
       </div>
 
@@ -176,34 +212,36 @@ const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {[
-                  { user: 'Jason Statham', initials: 'JS', action: 'Deposit', type: 'VAULT', asset: 'Solar Fund #02', time: '2 mins ago' },
-                  { user: 'New User', initials: 'NU', icon: 'person_add', action: 'Registration', type: 'ONBOARDING', asset: 'Standard Profile', time: '14 mins ago' },
-                  { user: 'Elena Marks', initials: 'EM', action: 'Withdraw', type: 'WITHDRAWAL', asset: 'ETH Liquidity Pool', time: '42 mins ago' },
-                ].map((item, i) => (
-                  <tr key={i}>
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${item.icon ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'}`}>
-                          {item.icon ? <span className="material-symbols-outlined text-sm">{item.icon}</span> : item.initials}
+                {loading ? (
+                    <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading activity...</td></tr>
+                ) : activity.length === 0 ? (
+                    <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No recent activity.</td></tr>
+                ) : (
+                    activity.map((item, i) => (
+                    <tr key={i}>
+                        <td className="py-4">
+                        <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-100 text-gray-600`}>
+                                {item.initials}
+                            </div>
+                            <span className="font-bold text-slate-900 dark:text-white">{item.user}</span>
                         </div>
-                        <span className="font-bold text-slate-900 dark:text-white">{item.user}</span>
-                      </div>
-                    </td>
-                    <td className="py-4">
-                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                        item.type === 'VAULT' ? 'bg-emerald-100 text-emerald-600' :
-                        item.type === 'ONBOARDING' ? 'bg-blue-100 text-blue-600' :
-                        'bg-purple-100 text-purple-600'
-                      }`}>
-                        {item.type}
-                      </span>
-                      <div className="text-xs font-bold text-slate-700 dark:text-gray-300 mt-1">{item.action}</div>
-                    </td>
-                    <td className="py-4 text-sm text-gray-500">{item.asset}</td>
-                    <td className="py-4 text-right text-xs text-gray-400 font-medium">{item.time}</td>
-                  </tr>
-                ))}
+                        </td>
+                        <td className="py-4">
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                            item.type === 'TRANSACTION' ? 'bg-emerald-100 text-emerald-600' :
+                            item.type === 'SYSTEM' ? 'bg-blue-100 text-blue-600' :
+                            'bg-purple-100 text-purple-600'
+                        }`}>
+                            {item.type}
+                        </span>
+                        <div className="text-xs font-bold text-slate-700 dark:text-gray-300 mt-1">{item.action}</div>
+                        </td>
+                        <td className="py-4 text-sm text-gray-500">{item.asset}</td>
+                        <td className="py-4 text-right text-xs text-gray-400 font-medium">{item.time}</td>
+                    </tr>
+                    ))
+                )}
               </tbody>
             </table>
           </div>
