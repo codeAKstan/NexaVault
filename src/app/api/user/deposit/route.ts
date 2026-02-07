@@ -47,6 +47,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Check KYC Status
+    if (user.kycStatus !== 'verified') {
+        return NextResponse.json({ error: 'Your account is not verified. Please complete KYC to deposit funds.' }, { status: 403 });
+    }
+
     const transaction = await Transaction.create({
       userId: user._id,
       type: 'deposit',

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface PaymentMethod {
   _id: string;
@@ -14,6 +15,8 @@ interface PaymentMethod {
 }
 
 const WithdrawPage: React.FC = () => {
+  const { user } = useAuth();
+  const router = useRouter();
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,6 +37,31 @@ const WithdrawPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (loading) return <div className="text-center py-12">Loading...</div>;
+
+  if (user?.kycStatus !== 'verified') {
+    return (
+        <div className="max-w-4xl mx-auto space-y-8">
+            <div><h1 className="text-2xl font-bold text-gray-900 dark:text-white">Withdraw</h1></div>
+            <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-3xl p-8 text-center">
+                <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500">
+                    <span className="material-symbols-outlined text-3xl">verified_user</span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Verification Required</h2>
+                <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                    To comply with financial regulations and ensure the security of our platform, you must complete the KYC verification process before requesting a withdrawal.
+                </p>
+                <button 
+                    onClick={() => router.push('/dashboard/profile')}
+                    className="bg-amber-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/20"
+                >
+                    Complete Verification
+                </button>
+            </div>
+        </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -76,9 +104,9 @@ const WithdrawPage: React.FC = () => {
                     </div>
                 </div>
 
-                <Link href={`/dashboard/withdraw/${method._id}`} className="w-full bg-primary text-white font-bold py-3 rounded-full hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 block">
+                <button onClick={() => router.push(`/dashboard/withdraw/${method._id}`)} className="w-full bg-primary text-white font-bold py-3 rounded-full hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 block">
                 Select this method
-                </Link>
+                </button>
             </div>
             ))
         )}

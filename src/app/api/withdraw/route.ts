@@ -33,6 +33,12 @@ export async function POST(req: Request) {
     const method = await PaymentMethod.findById(methodId);
 
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    
+    // Check KYC Status
+    if (user.kycStatus !== 'verified') {
+        return NextResponse.json({ error: 'Your account is not verified. Please complete KYC to withdraw funds.' }, { status: 403 });
+    }
+
     if (!method) return NextResponse.json({ error: 'Payment method not found' }, { status: 404 });
 
     // 2. Validate Amount (Min/Max and Balance)
