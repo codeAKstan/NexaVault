@@ -33,6 +33,13 @@ const TransactionSchema = new mongoose.Schema({
       return this.type === 'deposit';
     },
   },
+  charges: {
+    type: Number,
+    default: 0,
+  },
+  rejectionReason: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

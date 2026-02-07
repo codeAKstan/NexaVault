@@ -47,11 +47,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 });
     }
 
-    // 4. Calculate End Date (Simple parsing for '7 Days', '1 Months' etc.)
-    // This is a basic parser. In production, use a library like date-fns or moment.
-    const durationParts = plan.duration.split(' ');
-    const durationVal = parseInt(durationParts[0]);
-    const durationUnit = durationParts[1].toLowerCase(); // Days, Weeks, Months
+    // 4. Calculate End Date (Robust parsing)
+    // Supports "7 Days", "7Days", "7" (defaults to days)
+    const match = plan.duration.match(/(\d+)\s*([a-zA-Z]*)/);
+    const durationVal = match ? parseInt(match[1]) : 0;
+    const durationUnit = match && match[2] ? match[2].toLowerCase() : 'days'; 
 
     const endDate = new Date();
     if (durationUnit.includes('day')) {
