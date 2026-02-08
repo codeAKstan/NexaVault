@@ -1,4 +1,10 @@
 {
   "$schema": "https://vercel.com/schemas/v2/vercel.json",
-  "framework": "nextjs"
+  "framework": "nextjs",
+   "crons": [
+    {
+      "path": "/api/cron/roi",
+      "schedule": "0 * * * *"
+    }
+  ]
 }
