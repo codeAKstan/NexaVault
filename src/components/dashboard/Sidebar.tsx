@@ -133,10 +133,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           <span className="material-symbols-outlined">logout</span>
           <span className="font-medium text-sm">Log Out</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all text-emerald-400 border border-gray-700">
+        <Link 
+          href="/dashboard/connect-wallet" 
+          onClick={() => setIsOpen(false)}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+            pathname === '/dashboard/connect-wallet' 
+              ? 'bg-primary/10 text-primary border-l-4 border-primary' 
+              : 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-gray-700'
+          }`}
+        >
           <span className="material-symbols-outlined">account_balance_wallet</span>
           <span className="font-medium text-sm">Connect Wallet</span>
-        </button>
+        </Link>
       </div>
       
         <div className="p-4 mt-auto border-t border-gray-800">
